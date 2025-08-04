@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	sqlite3 "github.com/labulakalia/go-sqlcipher"
+	sqlite3 "github.com/WXjzcccc/go-sqlcipher"
 )
 
 func createBulkInsertQuery(n int, start int) (query string, args []interface{}) {

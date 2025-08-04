@@ -1111,6 +1111,7 @@ func (d *SQLiteDriver) Open(dsn string) (driver.Conn, error) {
 	var cacheSize *int64
 	pragmaKey := ""
 	pragmaCipherPageSize := -1
+	pragmaCompatibility := -1
 	pos := strings.IndexRune(dsn, '?')
 	if pos >= 1 {
 		params, err := url.ParseQuery(dsn[pos+1:])
@@ -1451,6 +1452,14 @@ func (d *SQLiteDriver) Open(dsn string) (driver.Conn, error) {
 			pragmaCipherPageSize = pageSize
 		}
 
+		if val := params.Get("_pragma_cipher_compatibility"); val != "" {
+			compatibility, err := strconv.Atoi(val)
+			if err != nil {
+				return nil, fmt.Errorf("sqlite3: _pragma_cipher_compatibility cannot be parsed: %s", err)
+			}
+			pragmaCompatibility = compatibility
+		}
+
 		// Cache size (_cache_size)
 		//
 		// https://sqlite.org/pragma.html#pragma_cache_size
@@ -1525,6 +1534,15 @@ func (d *SQLiteDriver) Open(dsn string) (driver.Conn, error) {
 	if pragmaCipherPageSize != -1 {
 		query := fmt.Sprintf("PRAGMA cipher_page_size = %d;",
 			pragmaCipherPageSize)
+		if err := exec(query); err != nil {
+			C.sqlite3_close_v2(db)
+			return nil, err
+		}
+	}
+
+	// _pragma_cipher_compatibility
+	if pragmaCompatibility != -1 {
+		query := fmt.Sprintf("PRAGMA cipher_compatibility = %d;", pragmaCompatibility)
 		if err := exec(query); err != nil {
 			C.sqlite3_close_v2(db)
 			return nil, err

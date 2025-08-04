@@ -14,7 +14,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	sqlite3 "github.com/labulakalia/go-sqlcipher"
+	sqlite3 "github.com/WXjzcccc/go-sqlcipher"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -100,7 +100,6 @@ func TestSQLCipherParallelSelect(t *testing.T) {
 	}
 }
 
-
 func TestSQLCipherVersion(t *testing.T) {
 	tmpdir, err := ioutil.TempDir("", testDir)
 	require.NoError(t, err)
@@ -153,8 +152,6 @@ func TestSQLCipherIsEncryptedTrue(t *testing.T) {
 		assert.True(t, encrypted)
 	}
 }
-
-
 
 func ExampleIsEncrypted() {
 	// create random key

@@ -27,13 +27,13 @@ See [migrating databases](https://www.zetetic.net/sqlcipher/sqlcipher-api/#Migra
 
 To upgrade your Go code to the 4.x series, change the import path to
 
-    "github.com/labulakalia/go-sqlcipher"
+    "github.com/WXjzcccc/go-sqlcipher"
 
 ### Installation
 
 This package can be installed with the go get command:
 
-    go get github.com/labulakalia/go-sqlcipher
+    go get github.com/WXjzcccc/go-sqlcipher
 
 
 ### Documentation
