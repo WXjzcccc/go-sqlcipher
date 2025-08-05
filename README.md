@@ -2,6 +2,59 @@
 
 [![GoDoc](http://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](http://godoc.org/github.com/mutecomm/go-sqlcipher) [![CI](https://github.com/mutecomm/go-sqlcipher/workflows/CI/badge.svg)](https://github.com/mutecomm/go-sqlcipher/actions)
 
+### My Changelog
+
+Add these pragmas:
+
+- _pragma_cipher_compatibility
+- _pragma_kdf_iter
+- _pragma_cipher_kdf_algorithm
+- _pragma_cipher_hmac_algorithm
+
+So you can open an encrypted database like this:
+
+```go
+dbPath := "EnMicroMsg.db"
+pwd := url.QueryEscape("your key")
+dbname := fmt.Sprintf("%s?_key=%s&_pragma_cipher_compatibility=1", dbPath, pwd)
+db, err := sql.Open("sqlite3", dbname)
+if err != nil {
+    fmt.Printf("open sqlite3 error: %v\n", err)
+}
+defer db.Close()
+if err != nil {
+    fmt.Printf("error: %v\n", err)
+}
+cur, err := db.Prepare("select value from userinfo where id = 2;")
+if err != nil {
+    fmt.Printf("select userinfo error: %v\n", err)
+}
+var wxid string
+err = cur.QueryRow().Scan(&wxid)
+if err != nil {
+    fmt.Printf("select userinfo error: %v\n", err)
+}
+fmt.Printf("userinfo: %v\n", wxid)
+```
+
+Of course, you can decrypt a database:
+
+```go
+dbPath := "FTS5IndexMicroMsg_encrypt.db"
+key := url.QueryEscape("your key")
+dbName := fmt.Sprintf("%s?_key=%s&_pragma_kdf_iter=64000&_pragma_cipher_kdf_algorithm=PBKDF2_HMAC_SHA1&_pragma_cipher_hmac_algorithm=HMAC_SHA1", dbPath, key)
+db, err := sql.Open("sqlite3", dbName)
+if err != nil {
+	t.Fatal(err)
+}
+// create a decrypted database
+decCmd := fmt.Sprintf("ATTACH DATABASE 'FTS_dec.db' AS FTS_dec KEY '';SELECT sqlcipher_export('FTS_dec');DETACH DATABASE FTS_dec;")
+_, err = db.Exec(decCmd)
+if err != nil {
+	t.Fatal(err)
+}
+```
+
 ### Description
 
 Self-contained Go sqlite3 driver with an AES-256 encrypted sqlite3 database
